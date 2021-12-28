@@ -86,7 +86,7 @@ class HelloGame
   end
 
   def render_icon
-    # @args.outputs.primitives << [@icon_x, @icon_y, 128, 101, 'dragonruby.png', 0, 128].sprites
+    @args.outputs.primitives << [@icon_x, @icon_y, 128, 101, 'dragonruby.png', 0, 128].sprites
   end
 
   def render
