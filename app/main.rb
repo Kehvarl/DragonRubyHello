@@ -9,6 +9,7 @@ class Sphere
     @vy ||= vy
     @sprite ||= sprite
     @slope ||= (@y2 - @y1) / (@x2 - @x1)
+    @size ||= 64
   end
 
   def x
@@ -19,8 +20,16 @@ class Sphere
     @y
   end
 
+  def vy
+    @vy
+  end
+
   def sprite
     @sprite
+  end
+
+  def size
+    @size
   end
 
   def tick
@@ -33,8 +42,9 @@ class Sphere
         @vy = -@vy
       end
     end
+    @size = 64 - 64 * (@y/360)
     @y += @vy
-    @x = @y/@slope + @x1 - 16
+    @x = @y/@slope + @x1 - (size/2)
   end
 end
 
@@ -55,6 +65,7 @@ class HelloGame
                  'sprites/circle/green.png', 'sprites/circle/indigo.png', 'sprites/circle/orange.png',
                  'sprites/circle/red.png', 'sprites/circle/violet.png', 'sprites/circle/white.png',
                  'sprites/circle/yellow.png']
+      sprites = ['sprites/misc/star.png']
       0.step(1280, 128) do |x|
         @spheres.append(Sphere.new(x, @merge_x, 0, @merge_y, 1 + Math.sin(x).abs(), sprites.sample()))
       end
@@ -77,7 +88,7 @@ class HelloGame
       y += (@merge_y - y)/10 + 10
     end
     for s in @spheres
-      @args.outputs.primitives << [s.x, s.y, 32, 32, s.sprite, -90].sprites
+      @args.outputs.primitives << [s.x, s.y, s.size, s.size, s.sprite, (s.y * s.vy)].sprites
     end
   end
 
@@ -86,7 +97,7 @@ class HelloGame
   end
 
   def render_icon
-    @args.outputs.primitives << [@icon_x, @icon_y, 128, 101, 'dragonruby.png', 0, 128].sprites
+    # @args.outputs.primitives << [@icon_x, @icon_y, 128, 101, 'dragonruby.png', 0, 128].sprites
   end
 
   def render
