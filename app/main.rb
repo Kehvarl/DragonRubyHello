@@ -38,13 +38,74 @@ class Sphere
         @vy = -@vy
       end
     else
-      if @y + @vy < @y1 then
+      if @y + @vy < (@y1 - @size / 2) then
         @vy = -@vy
       end
     end
-    @size = 64 - 64 * (@y/360)
+    @size = 64 - (64 * (@y/@y2))
     @y += @vy
-    @x = @y/@slope + @x1 - (size/2)
+    @x = @y/@slope + @x1 - (@size / 2) + (((640 - @x1)/640) * @size)
+  end
+end
+
+class Dragon
+  def initialize x, y, vx, vy, sprites
+    @x ||= x
+    @y ||= y
+    @vy ||= vy
+    @vx ||= vx
+    @flip_horizontally ||= false
+    @sprites ||= sprites
+    @current ||= 0
+    @anim_delay ||= 10
+    @max_delay ||= 10
+    @size ||= 64
+  end
+
+  def x
+    @x
+  end
+
+  def y
+    @y
+  end
+
+  def sprite
+    @sprites[@current]
+  end
+
+  def flip_horizontally
+    @flip_horizontally
+  end
+
+  def size
+    @size
+  end
+
+  def tick
+    @x += @vx
+    @y += @vy
+    if @x > 1280
+      @vx = -@vx
+      @flip_horizontally = true
+    elsif @x < (0 - @size)
+      @vx = -@vx
+      @flip_horizontally = false
+    end
+    if @y > (720 - @size)
+      @vy = -@vy
+    elsif @y < 360
+      @vy = -@vy
+    end
+
+    @anim_delay -= 1
+    if @anim_delay == 0
+      @anim_delay = @max_delay
+      @current += 1
+      if @current == @sprites.length
+        @current = 0
+      end
+    end
   end
 end
 
@@ -60,11 +121,11 @@ class HelloGame
     @merge_y ||= @center_y
     @spheres ||= []
 
+    sprites = ['sprites/misc/dragon-1.png', 'sprites/misc/dragon-2.png', 'sprites/misc/dragon-3.png',
+               'sprites/misc/dragon-4.png', 'sprites/misc/dragon-3.png','sprites/misc/dragon-2.png']
+    @dragon = Dragon.new(@center_x, @center_y, 1, 1, sprites)
+
     if @spheres.length == 0
-      sprites = ['sprites/circle/black.png', 'sprites/circle/blue.png', 'sprites/circle/gray.png',
-                 'sprites/circle/green.png', 'sprites/circle/indigo.png', 'sprites/circle/orange.png',
-                 'sprites/circle/red.png', 'sprites/circle/violet.png', 'sprites/circle/white.png',
-                 'sprites/circle/yellow.png']
       sprites = ['sprites/misc/star.png']
       0.step(1280, 128) do |x|
         @spheres.append(Sphere.new(x, @merge_x, 0, @merge_y, 1 + Math.sin(x).abs(), sprites.sample()))
@@ -90,6 +151,9 @@ class HelloGame
     for s in @spheres
       @args.outputs.primitives << [s.x, s.y, s.size, s.size, s.sprite, (s.y * s.vy)].sprites
     end
+
+    @args.outputs.primitives << {x: @dragon.x, y: @dragon.y, w: 64, h: 64, path: @dragon.sprite,
+                                 flip_horizontally: @dragon.flip_horizontally}.sprite!
   end
 
   def render_text
@@ -113,6 +177,7 @@ class HelloGame
     end
     @rotation -= 1
     render
+    @dragon.tick()
     for s in @spheres
       s.tick()
     end
