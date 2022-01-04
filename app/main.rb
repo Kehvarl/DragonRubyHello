@@ -189,4 +189,17 @@ end
 def tick args
   args.state.game ||= HelloGame.new args
   args.state.game.game_tick
+  args.state.r ||= 1
+  cx = 1280/2
+  cy = 729/2
+  size = (args.state.r/360)*16
+  0.step(360, 12).each do |t|
+    x = cx + args.state.r * Math.cos((t - (args.state.r)) * Math::PI/180)
+    y = cy + args.state.r * Math.sin((t - (args.state.r)) * Math::PI/180)
+    args.outputs.primitives << [x, y, 8, 8, 'sprites/misc/tiny-star.png'].sprites
+  end
+  args.state.r += 1
+  if args.state.r > 360
+    args.state.r = 1
+  end
 end
