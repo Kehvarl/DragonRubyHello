@@ -184,22 +184,45 @@ class HelloGame
   end
 end
 
+class Stars
+  def initialize cx, cy, ir, vr, sprite, args
+    @cx ||= cx
+    @cy ||= cy
+    @r ||= ir
+    @vr ||= vr
+    @sprite ||= sprite
+    @args ||= args
+  end
+
+  def render
+    size = (@r/360)*16
+    0.step(360, 12).each do |t|
+      x = @cx + @r * Math.cos((t - (@r)) * Math::PI/180)
+      y = @cy + @r * Math.sin((t - (@r)) * Math::PI/180)
+      @args.outputs.primitives << [x, y, 16, 16, @sprite].sprites
+    end
+  end
+
+  def tick
+    @r += 1
+    if @r > 360
+      @r = 1
+    end
+    render
+  end
+end
 
 
 def tick args
   args.state.game ||= HelloGame.new args
   args.state.game.game_tick
-  args.state.r ||= 1
   cx = 1280/2
   cy = 729/2
-  size = (args.state.r/360)*16
-  0.step(360, 12).each do |t|
-    x = cx + args.state.r * Math.cos((t - (args.state.r)) * Math::PI/180)
-    y = cy + args.state.r * Math.sin((t - (args.state.r)) * Math::PI/180)
-    args.outputs.primitives << [x, y, 8, 8, 'sprites/misc/tiny-star.png'].sprites
-  end
-  args.state.r += 1
-  if args.state.r > 360
-    args.state.r = 1
-  end
+  args.state.s1 ||= Stars.new(cx, cy, 1, 1, 'sprites/misc/tiny-star.png', args)
+  args.state.s2 ||= Stars.new(cx, cy, 120, 1, 'sprites/misc/tiny-star.png', args)
+  args.state.s3 ||= Stars.new(cx, cy, 240, 1, 'sprites/misc/tiny-star.png', args)
+
+  args.state.s1.tick
+  args.state.s2.tick
+  args.state.s3.tick
 end
