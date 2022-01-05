@@ -225,11 +225,15 @@ class StarSpiral
   end
 
   def render
-    size = (@r/360)*16
-    0.step(720, 12).each do |t|
-      x = @cx + (@ir + t) * Math.cos((t - (@r)) * Math::PI/180)
-      y = @cy + (@ir + t) * Math.sin((t - (@r)) * Math::PI/180)
-      @args.outputs.primitives << [x, y, 8, 8, @sprite, t].sprites
+    s = 0
+    0.step(3032, 83).each do |t|
+      size = ((@ir + s)/360)*16
+      x = @cx + (@ir + s) * Math.cos((t - (@r)) * Math::PI/180)
+      y = @cy + (@ir + s) * Math.sin((t - (@r)) * Math::PI/180)
+      if size > 2
+        @args.outputs.primitives << [x, y, size, size, @sprite].sprites
+      end
+      s += 16
     end
   end
 
