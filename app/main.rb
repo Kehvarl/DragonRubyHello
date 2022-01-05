@@ -212,6 +212,35 @@ class Stars
   end
 end
 
+class StarSpiral
+  def initialize cx, cy, ir, er, vr, sprite, args
+    @cx ||= cx
+    @cy ||= cy
+    @ir = ir
+    @er = er
+    @r ||= ir
+    @vr ||= vr
+    @sprite ||= sprite
+    @args ||= args
+  end
+
+  def render
+    size = (@r/360)*16
+    0.step(720, 12).each do |t|
+      x = @cx + (@ir + t) * Math.cos((t - (@r)) * Math::PI/180)
+      y = @cy + (@ir + t) * Math.sin((t - (@r)) * Math::PI/180)
+      @args.outputs.primitives << [x, y, 8, 8, @sprite, t].sprites
+    end
+  end
+
+  def tick
+    @r += 1
+    if @r > 360
+      @r = 1
+    end
+    render
+  end
+end
 
 def tick args
   args.state.game ||= HelloGame.new args
@@ -219,10 +248,10 @@ def tick args
   cx = 1280/2
   cy = 729/2
   args.state.s1 ||= Stars.new(cx, cy, 1, 1, 'sprites/misc/tiny-star.png', args)
-  args.state.s2 ||= Stars.new(cx, cy, 120, 1, 'sprites/misc/tiny-star.png', args)
-  args.state.s3 ||= Stars.new(cx, cy, 240, 1, 'sprites/misc/tiny-star.png', args)
+  args.state.s2 ||= StarSpiral.new(cx, cy, 0, 1, 360, 'sprites/misc/tiny-star.png', args)
 
-  args.state.s1.tick
+  #args.state.s1.tick
   args.state.s2.tick
-  args.state.s3.tick
+
+
 end
