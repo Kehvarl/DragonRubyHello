@@ -8,4 +8,3 @@ A simple example based on the Dragonruby HelloWorld sample application
 2. Download the code here and put all the files under the `mygame` directory located in the Game Toolkit environment.
 3. Run `./dragonruby` to launch the game.
 4. Change code to see the updates reflected live.
-
